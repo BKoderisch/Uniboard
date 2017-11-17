@@ -1,0 +1,2 @@
+AnalogTemp	KEYWORD1
+readTemp  	KEYWORD1
