@@ -1,13 +1,12 @@
 /**
 * this programm is the standard Uniboard programm. 
-* It publish the sensor Values of a analog sensor to a mqtt server.
+* It publish the sensor Values of an analog sensor to a mqtt server.
 *
 * @author Benjamin Koderisch
 * @version 1.0 17.11.17
 */
 
 #include <ESP8266WiFi.h>
-#include <Wire.h>
 #include <PubSubClient.h>
 #include <StatusLed.h>
 #include <AnalogTemp.h>
@@ -17,12 +16,21 @@
 #define mqtt_server "192.168.178.49"
 #define sensor_topic "sensorNode1/temperature"
 
+// create objects
 AnalogTemp tempSensor(0);
-StatusLed statusLed(2);
-
+StatusLed statusLed(12);
 WiFiClient espClient;
 PubSubClient client(espClient);
 
+// create local variables
+private long lastMsg = 0;
+private float temp = 0.0;
+private float hum = 0.0;
+private float diff = 1.0;
+
+/**
+* Function to connect to the WiFi.
+*/
 void setup_wifi() {
   delay(10);
   // We start by connecting to a WiFi network
@@ -43,6 +51,9 @@ void setup_wifi() {
   Serial.println(WiFi.localIP());
 }
 
+/**
+* Functions will be called when the connection is lost
+*/
 void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
@@ -62,17 +73,36 @@ void reconnect() {
   }
 }
 
+/**
+* handle arrived messages
+*
+* @param topic describes the topic of the arrived message
+* @param payload contains the data
+* @param length amount of chars in the message
+*/
+void callback(char* topic, byte* payload, unsigned int length) {
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+  for (int i=0;i<length;i++) {
+    Serial.print((char)payload[i]);
+  }
+  Serial.println();
+}
+
+/**
+* Fist function that is called by the program.
+* Contains initialisations
+*/
 void setup() {
   Serial.begin(115200);
   setup_wifi();
   client.setServer(mqtt_server, 1883);  
 }
 
-long lastMsg = 0;
-float temp = 0.0;
-float hum = 0.0;
-float diff = 1.0;
-
+/**
+* Main function that loops until death.
+*/
 void loop() {
   // make shure that the client is connected
   if (!client.connected()) {
