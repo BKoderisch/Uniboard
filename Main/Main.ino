@@ -11,22 +11,22 @@
 #include <StatusLed.h>
 #include <AnalogTemp.h>
 
-#define wifi_ssid "Zandi"
-#define wifi_password "22627898426324258151"
-#define mqtt_server "192.168.178.49"
+#define wifi_ssid "SSID"
+#define wifi_password "PW"
+#define mqtt_server "SERVER-IP"
 #define sensor_topic "sensorNode1/temperature"
 
 // create objects
 AnalogTemp tempSensor(0);
-StatusLed statusLed(12);
+StatusLed statusLed(10);
 WiFiClient espClient;
 PubSubClient client(espClient);
 
 // create local variables
-private long lastMsg = 0;
-private float temp = 0.0;
-private float hum = 0.0;
-private float diff = 1.0;
+long lastMsg = 0;
+float temp = 0.0;
+float hum = 0.0;
+float diff = 1.0;
 
 /**
 * Function to connect to the WiFi.
@@ -43,6 +43,7 @@ void setup_wifi() {
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
+    statusLed.blink(1, 50);
   }
 
   Serial.println("");
@@ -61,6 +62,7 @@ void reconnect() {
     // Attempt to connect
     if (client.connect("ESP8266Client")) {
       Serial.println("connected");
+      client.subscribe("#");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -98,6 +100,7 @@ void setup() {
   Serial.begin(115200);
   setup_wifi();
   client.setServer(mqtt_server, 1883);  
+  client.setCallback(callback);
 }
 
 /**
