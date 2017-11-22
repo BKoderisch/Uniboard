@@ -2,3 +2,4 @@ StatusLed	KEYWORD1
 setLedOn  	KEYWORD1
 setLedOff   KEYWORD1
 blink   	KEYWORD1
+StatusLed   KEYWORD1

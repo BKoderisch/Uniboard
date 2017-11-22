@@ -9,20 +9,21 @@
 // constuctor
 StatusLed::StatusLed(byte pin){
     this->statusPin = pin;
+    pinMode(statusPin, OUTPUT);
 }
 
 /**
 * function to turn the status led on
 */
 void StatusLed::setLedOn(){
-    analogWrite(statusPin, 255);
+    digitalWrite(statusPin, HIGH);
 }
 
 /**
 * function to turn the status led off
 */
 void StatusLed::setLedOff(){
-    analogWrite(statusPin, 0);
+    digitalWrite(statusPin, LOW);
 }
 
 /**
