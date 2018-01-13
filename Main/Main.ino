@@ -10,9 +10,10 @@
 #include <PubSubClient.h>
 #include <StatusLed.h>
 #include <AnalogTemp.h>
+#include <DNSServer.h>
+#include <ESP8266WebServer.h>
+#include <WiFiManager.h>
 
-#define wifi_ssid "SSID"
-#define wifi_password "PW"
 #define mqtt_server "SERVER-IP"
 #define sensor_topic "sensorNode1/temperature"
 
@@ -28,29 +29,6 @@ float temp = 0.0;
 float hum = 0.0;
 float diff = 1.0;
 
-/**
-* Function to connect to the WiFi.
-*/
-void setup_wifi() {
-  delay(10);
-  // We start by connecting to a WiFi network
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(wifi_ssid);
-
-  WiFi.begin(wifi_ssid, wifi_password);
-
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-    statusLed.blink(1, 50);
-  }
-
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
-}
 
 /**
 * Functions will be called when the connection is lost
@@ -98,7 +76,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
 */
 void setup() {
   Serial.begin(115200);
-  setup_wifi();
+  WiFiManager wifiManager;
+  wifiManager.autoConnect("AutoConnectAP");
   client.setServer(mqtt_server, 1883);  
   client.setCallback(callback);
 }
