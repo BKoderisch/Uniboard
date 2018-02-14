@@ -14,8 +14,8 @@
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h>
 
-#define mqtt_server "SERVER-IP"
-#define sensor_topic "sensorNode1/temperature"
+#define mqtt_server "52.58.176.229"
+#define sensor_topic "server/test"
 
 // create objects
 AnalogTemp tempSensor(0);
@@ -28,7 +28,7 @@ long lastMsg = 0;
 float temp = 0.0;
 float hum = 0.0;
 float diff = 1.0;
-
+int ledPin = 15;
 
 /**
 * Functions will be called when the connection is lost
@@ -64,10 +64,21 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
+  String message = "";
   for (int i=0;i<length;i++) {
+    message = message + (char)payload[i];
     Serial.print((char)payload[i]);
   }
   Serial.println();
+
+  Serial.println(message);
+  if(message.equals("on")){
+    digitalWrite(ledPin, HIGH);
+    Serial.println("an");
+  } else if (message.equals("off")){
+    digitalWrite(ledPin, LOW);
+    Serial.println("aus");
+  }
 }
 
 /**
@@ -80,6 +91,7 @@ void setup() {
   wifiManager.autoConnect("AutoConnectAP");
   client.setServer(mqtt_server, 1883);  
   client.setCallback(callback);
+  pinMode(ledPin, OUTPUT);
 }
 
 /**
